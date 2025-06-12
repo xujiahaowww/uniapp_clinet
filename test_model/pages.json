@@ -1,0 +1,28 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	    {
+            "path" : "pages/index/deepseek/deepseek",
+            "style" : {
+				"navigationBarTitleText": "列表首页"
+			}
+        }
+        ,{
+            "path" : "pages/index/deepseek/detail",
+            "style" : {
+					"navigationBarTitleText": "病情详情"
+			}
+        }
+        ,{
+            "path" : "pages/index/deepseek/persondetail",
+            "style" : {
+				"navigationBarTitleText": "人员录入"
+			}
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}
