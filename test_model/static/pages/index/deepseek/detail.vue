@@ -3,23 +3,23 @@
 		<!-- 姓名输入 -->
 		<view class="header_contain">
 			<view class="left">
-				<view class="form-item">
+				<view class="form-item" style="border-bottom: 1px solid #2C405A;">
 					<text>姓名:</text><text>{{name}}</text>
-
+				
 				</view>
-				<view class="form-item">
+				<view class="form-item" style="border-bottom: 1px solid #2C405A;">
 					<text>性别:</text><text>{{sex}}</text>
 				</view>
 				<!-- 年龄输入 -->
-				<view class="form-item">
+				<view class="form-item" style="border-bottom: 1px solid #2C405A;">
 					<text>年龄:</text><text>{{age}}</text>
 				</view>
-				<view class="form-item">
+				<view class="form-item" style="border-bottom: 1px solid #2C405A;">
 					<text>电话:</text><text>{{phonenumber}}</text>
 				</view>
 			</view>
 			<view class="right">
-				<image :src="avator" style="width: 100%;height: 100%;" />
+				<image  :src="avator" style="width: 100%;"/>
 			</view>
 		</view>
 
@@ -30,60 +30,46 @@
 			<text>详情描述:</text>
 			<input type="text" v-model="detail" placeholder="请输入描述" />
 			<text>上传材料:</text>
-			<view>	
-				<image :src="upload" @click="chooseFile"
-					style="height: 100rpx;width: 100rpx;margin-top: 10rpx;margin-left: 30rpx;"></image>
-				<!-- <button @click="chooseFile">选择文件</button> -->
-			</view>
-
+			<button @click="chooseFile">选择文件</button>
 			<view v-if="fileName" class="file-name">{{ fileName }}</view>
 			<view v-if="fileName" @click="shanchu" style=" color:#808080;width: 10%;border-radius: 7px;">删除</view>
 			<view v-if="filePath" class="image-preview">
 				<image :src="filePath" class="preview-img" />
 			</view>
-		</view>
+		</view>	
 
-		<swiper v-if="file_list.length" class="swiper" :indicator-dots="true" @change="swiperSwitch" style="height: 500rpx;">
+		<swiper v-if="file_list.length" class="swiper" :indicator-dots="true" @change="swiperSwitch">
 			<swiper-item v-for="(item, index) in file_list" :index="index" :key="index">
 				<view class="grid-item-box" style="background-color: #fff;">
-					<image @click="preview(index)" :src="item.filePath" class="preview-img" />
+					<image  @click="preview(index)" :src="item.filePath" class="preview-img" />
 					<text class="text">{{item.fileName}}</text>
 				</view>
 			</swiper-item>
 		</swiper>
-		<view v-if="file_list.length">
+		<view v-if= "file_list.length">
 			<text style="color: #007AFF;" @click="cheack">查看详情|</text>
 			<text style="color: #DD524D;" @click="delect">删除</text>
+			</view>
+		<view  class="fade-view" :class="{ hidden: !check }">
+			<view class="form-item">
+				<text>概况描述:</text>
+				<view class="text-box">{{show_detail}}</view> 
+			</view>
+			<view class="form-item">
+				<text>模型分析:</text>
+				<view class="text-box">{{show_model_detail}}</view>
+			</view>
+			<view style="height: 100rpx;"></view>
 		</view>
-		<view class="form-item">
-			<text>概况描述:</text>
-			<view class="text-box">{{show_detail}}</view>
-		</view>
-		<view class="form-item">
-			<text>模型分析:</text>
-			<MarkdownView :markdown="show_model_detail"></MarkdownView>
-			<!-- <view class="text-box">{{show_model_detail}}</view> -->
-		</view>
-		<view style="height: 100rpx;"></view>
 		<!-- 提交按钮 -->
 		<button class="submit-btn" @click="submitForm">提交</button>
 	</view>
 </template>
 
 <script>
-	import {
-		BASE_URL
-	} from '@/static/config.js';
-	import MarkdownView from './zero-markdown-view/components/zero-markdown-view/zero-markdown-view.vue'
-	import upload from './upload.png'
-	import test from '../test.vue'
 	export default {
-		components: {
-			MarkdownView // 注册组件
-		},
 		data() {
 			return {
-				upload: upload,
 				userid: this.$route.query.userid || '',
 				phonenumber: this.$route.query.phonenumber || '',
 				name: this.$route.query.name || '', // 姓名
@@ -92,20 +78,20 @@
 				avator: this.$route.query.filePath || '', // 年龄
 				detail: '',
 				file_list: [],
-				imageList: [],
+				imageList:[],
 				fileName: '', // 上传的文件名
 				filePath: '', // 上传的文件路径
-				check: false,
+				check:false,
 				nowindex: 0,
 				show_detail: '',
 				show_model_detail: '',
 			};
 		},
 		async onShow() {
-			await this.initFn(this.userid)
+			await this.initFn(this.userid)		
 		},
 		methods: {
-			initFn() {
+			initFn(){
 				uni.showLoading({
 					title: '加载中...', // 可自定义加载框的提示文本
 					mask: false // 设置为 `true` 时，会显示一个遮罩层，防止用户进行其他操作
@@ -115,7 +101,7 @@
 				}, 5000)
 				uni.request({
 					method: 'POST',
-					url: `${ BASE_URL }/first/imageload`, //仅为示例，并非真实接口地址。
+					url: 'http://192.168.2.59:3000/first/imageload', //仅为示例，并非真实接口地址。
 					data: {
 						userid: this.userid
 					},
@@ -127,11 +113,11 @@
 						let imagelist = []
 						res.data.forEach((item) => {
 							imagelist.push(
-								`${ BASE_URL }` + item.filePath
+							"http://192.168.2.59:3000/" + item.filePath
 							)
 							list.push({
 								...item,
-								filePath: `${ BASE_URL }` + item.filePath
+								filePath: "http://192.168.2.59:3000/" + item.filePath
 							})
 						})
 						this.imageList = imagelist
@@ -148,26 +134,26 @@
 					this.filePath = ''
 			},
 			preview(index) {
-				uni.previewImage({
-					current: this.imageList[index], // 当前预览的图片
-					urls: this.imageList // 图片数组
-				});
+			      uni.previewImage({
+			        current: this.imageList[index], // 当前预览的图片
+			        urls: this.imageList // 图片数组
+			      });
+			    },
+			swiperSwitch(e){
+				  this.nowindex = e.detail.current
+				  this.check = false
+				  this.show_detail = this.file_list[this.nowindex].detail
+				  this.show_model_detail = this.file_list[this.nowindex].modeldetial || ''
 			},
-			swiperSwitch(e) {
-				this.nowindex = e.detail.current
-				this.check = false
-				this.show_detail = this.file_list[this.nowindex].detail
-				this.show_model_detail = this.file_list[this.nowindex].ai_content || ''
-			},
-			cheack() {
+			cheack(){
 				this.check = true
 			},
-			delect() {
+			delect(){
 				let id = this.file_list[this.nowindex].id
-				console.log(id, 'idddddddddddddddd')
+				console.log(id,'idddddddddddddddd')
 				uni.request({
 					method: 'POST',
-					url: `${ BASE_URL }first/imagedelect`, //仅为示例，并非真实接口地址。
+					url: 'http://192.168.2.59:3000/first/imagedelect', //仅为示例，并非真实接口地址。
 					data: {
 						id: id
 					},
@@ -177,16 +163,16 @@
 					success: (res) => {
 						this.initFn()
 						uni.showToast({
-							title: '删除成功',
-							icon: 'success', // 可选：'success'、'loading'、'none'
-							duration: 1000 // 显示时长，单位毫秒
+							  title: '删除成功',
+							  icon: 'success', // 可选：'success'、'loading'、'none'
+							  duration: 1000   // 显示时长，单位毫秒
 						})
 					},
 					fail: () => {
 						uni.showToast({
-							title: '删除失败',
-							icon: 'none', // 可选：'success'、'loading'、'none'
-							duration: 1000 // 显示时长，单位毫秒
+							  title: '删除失败',
+							  icon: 'none', // 可选：'success'、'loading'、'none'
+							  duration: 1000   // 显示时长，单位毫秒
 						})
 					}
 				})
@@ -231,7 +217,7 @@
 				const now = new Date()
 				// 使用 uni.uploadFile 上传文件
 				uni.uploadFile({
-					url: `${ BASE_URL }first/imagesave`, // 后端上传接口
+					url: 'http://192.168.2.59:3000/first/imagesave', // 后端上传接口
 					filePath: this.filePath,
 					name: 'filePath',
 					formData: {
@@ -240,7 +226,7 @@
 						detail: this.detail,
 						fileName: this.fileName
 					},
-					success: (res) => {
+					success:(res)=> {
 						const data = JSON.parse(res.data);
 						if (data.success) {
 							uni.hideLoading()
@@ -276,28 +262,21 @@
 	.container {
 		/* padding: 20px; */
 	}
-
-	.header_contain {
+	.header_contain{
 		width: 100%;
 		display: flex;
-		border: 1px solid darkgray;
 	}
-
-	.left {
-		flex: 6;
-		padding-left: 10px
+	.left{
+		flex:6;
 	}
-
-	.right {
-		flex: 4;
+	.right{
+		flex:4;
 		margin: 5px;
+		height: 80%;
 		border-radius: 16rpx;
 	}
-
 	.form-item {
 		margin-bottom: 15px;
-		padding-left: 10px;
-		padding-right: 10px;
 	}
 
 	input {
@@ -353,7 +332,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 15px 0;
-
+		
 	}
 
 	.grid-dot {
@@ -361,13 +340,20 @@
 		top: 5px;
 		right: 15px;
 	}
-
 	.text-box {
-		word-break: break-word;
-		/* 强制长单词换行 */
-		white-space: normal;
-		/* 允许换行 */
-		overflow-wrap: break-word;
-		/* 防止长串不换行 */
+	  word-break: break-word; /* 强制长单词换行 */
+	  white-space: normal;    /* 允许换行 */
+	  overflow-wrap: break-word; /* 防止长串不换行 */
+	}
+	.fade-view {
+	  transition: opacity 0.5s ease, transform 0.5s ease;
+	  opacity: 1;
+	  transform: scale(1);
+	}
+	
+	.hidden {
+	  opacity: 0;
+	  transform: scale(0.95); /* 可选的缩小动画 */
+	  pointer-events: none; /* 防止点击 */
 	}
 </style>

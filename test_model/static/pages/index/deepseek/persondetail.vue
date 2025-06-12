@@ -33,7 +33,6 @@
 </template>
 
 <script>
-	import { BASE_URL } from '@/static/config.js';
 	export default {
 		data() {
 			return {
@@ -88,7 +87,7 @@
 				}, 5000)
 				// 使用 uni.uploadFile 上传文件
 				uni.uploadFile({
-					url: `${BASE_URL}first/savepersson`, // 你的后端上传接口
+					url: 'http://192.168.2.59:3000/first/savepersson', // 你的后端上传接口
 					filePath: this.filePath,
 					name: 'filePath', // 后端接收字段名
 					formData: {

@@ -1,5 +1,3 @@
-
-
 <template>
 	<view class="container">
 		<view class="search-bar">
@@ -21,7 +19,6 @@
 					<view class="details">联系电话：{{ item.phonenumber }}</view>
 				</view>
 				<button class="viewDetails(item)" @click="viewDetails(item)">查看详情</button>
-				<!-- <button v-if="index === 0" @click="editPerson(item)" style="margin-left: 10rpx;">修改</button> -->
 			</view>
 		</view>
 		<view class="blank"></view>
@@ -39,13 +36,12 @@
 			 <button @click="closeDialog" type="primary" style="margin-right: 20rpx;" size="mini">关闭</button>
 		    <button @click="deleOk" type="warn" size="mini" style="margin-left: 20rpx;">确定</button>
 		  </view>
-		  
 		</view>
 	</view>
 </template>
 
 <script>
-	import { BASE_URL } from '@/static/config.js';
+
 	export default {
 
 		data() {
@@ -73,7 +69,7 @@
 				}, 5000)
 				uni.request({
 					method: 'POST',
-					url: `${BASE_URL}first/search`, //仅为示例，并非真实接口地址。
+					url: 'http://192.168.2.59:3000/first/search', //仅为示例，并非真实接口地址。
 					data: {
 						username: this.searchQuery
 					},
@@ -86,7 +82,7 @@
 						res.data.forEach((item) => {
 							list.push({
 								...item,
-								filePath: `${BASE_URL}` + item.filePath
+								filePath: "http://192.168.2.59:3000/" + item.filePath
 							})
 						})
 						this.list = list || []
@@ -108,11 +104,7 @@
 					url: `/pages/index/deepseek/detail?userid=${item.userid}&age=${item.age}&name=${item.name}&phonenumber=${item.phonenumber}&sex=${item.sex}&filePath=${item.filePath}`
 				});
 			},
-			editPerson(item) {
-			  uni.navigateTo({
-			    url: `/pages/index/deepseek/persondetail?userid=${item.userid}&age=${item.age}&name=${item.name}&phonenumber=${item.phonenumber}&sex=${item.sex}&filePath=${item.filePath}&mode=edit`
-			  })
-			},
+
 			// 创建跳转新页面
 			newChange() {
 				let id = this.max_id + 1
@@ -137,7 +129,7 @@
 				}, 5000)
 				uni.request({
 					method: 'POST',
-					url: `${BASE_URL}first/delpersson`, //仅为示例，并非真实接口地址。
+					url: 'http://192.168.2.59:3000/first/delpersson', //仅为示例，并非真实接口地址。
 					data: {
 						id:  this.current.id,
 						userid: this.current.userid,
