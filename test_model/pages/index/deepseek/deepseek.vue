@@ -18,16 +18,20 @@
 					<text class="name">{{ item.name }}</text>
 					<text class="details">|{{ item.sex }} | {{ item.age }}岁 </text>
 					<text class="details" style="display: inline-block; overflow: hidden;"></text>
-					<view class="details">联系电话：{{ item.phonenumber }}</view>
+					<view class="details">联系电话:{{ item.phonenumber }}</view>
 				</view>
-				<button class="viewDetails(item)" @click="viewDetails(item)">查看详情</button>
+				<view style="display: flex;flex-direction: column;">
+					<button style="width: 200rpx;" @click="viewDetails(item)">查看详情</button>
+					<button style="width: 200rpx;" @click="editPerson(item)" >修改个人</button> 
+				</view>
+				
 				<!-- <button v-if="index === 0" @click="editPerson(item)" style="margin-left: 10rpx;">修改</button> -->
 			</view>
 		</view>
 		<view class="blank"></view>
 		<!-- <button v-if="searchQuery" class="button" type="primary" @click="initFn()">搜索</button> -->
 
-		<button class="button" type="primary" @click="newChange()">新增列表</button>
+		<button class="button" type="primary" @click="newChange()">新增病员</button>
 		
 		  <!-- 弹窗内容 -->
 		  <view v-if="showDialog" class="dialog" style="text-align: center;">
@@ -110,7 +114,7 @@
 			},
 			editPerson(item) {
 			  uni.navigateTo({
-			    url: `/pages/index/deepseek/persondetail?userid=${item.userid}&age=${item.age}&name=${item.name}&phonenumber=${item.phonenumber}&sex=${item.sex}&filePath=${item.filePath}&mode=edit`
+				url: `/pages/index/deepseek/persondetail?userid=${item.userid}&age=${item.age}&name=${item.name}&phonenumber=${item.phonenumber}&sex=${item.sex}&filePath=${item.filePath}&fileName=${item.fileName}&mode=edit`
 			  })
 			},
 			// 创建跳转新页面
@@ -229,6 +233,7 @@
 
 	.info {
 		flex: 1;
+		max-width: 300rpx;
 	}
 
 	.name {
@@ -239,6 +244,8 @@
 	.details {
 		color: #888;
 		font-size: 14px;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 

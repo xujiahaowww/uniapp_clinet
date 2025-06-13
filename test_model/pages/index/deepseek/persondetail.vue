@@ -10,21 +10,21 @@
 		<!-- 姓名输入 -->
 		<view class="form-item">
 			<text>姓名:</text>
-			<input v-model="name" placeholder="请输入姓名" />
+			<input v-model="name" maxlength = '8' placeholder="请输入姓名" />
 		</view>
 		<view class="form-item">
 			<text>性别:</text>
-			<input v-model="sex" placeholder="请输入性别" />
+			<input v-model="sex" maxlength = '4' placeholder="请输入性别" />
 		</view>
 		<view class="form-item">
 			<text>电话:</text>
-			<input type="number" v-model="phonenumber" placeholder="请输入电话" />
+			<input type="number" v-model="phonenumber" maxlength = '11' placeholder="请输入电话" />
 		</view>
 
 		<!-- 年龄输入 -->
 		<view class="form-item">
 			<text>年龄:</text>
-			<input type="number" v-model="age" placeholder="请输入年龄" />
+			<input type="number" maxlength = '3' v-model="age" placeholder="请输入年龄" />
 		</view>
 
 		<!-- 提交按钮 -->
@@ -33,17 +33,32 @@
 </template>
 
 <script>
-	import { BASE_URL } from '@/static/config.js';
+	import {
+		BASE_URL
+	} from '@/static/config.js';
 	export default {
 		data() {
 			return {
-				filePath:'',
-				userid: this.$route.query.userid || '',
+				filePath: '',
+				fileName:'',
+				// userid: this.$route.query.userid || '',
+				userid: '',
 				phonenumber: '',
 				name: '', // 姓名
 				sex: '',
 				age: '', // 年龄
+				mode:''
 			};
+		},
+		onLoad(options) { // 🔴 新增，用于接收 editPerson 传过来的参数
+			this.userid = options.userid || '';
+			this.name = options.name || '';
+			this.age = options.age || '';
+			this.sex = options.sex || '';
+			this.phonenumber = options.phonenumber || '';
+			this.filePath = options.filePath || '';
+			this.fileName = options.fileName || ''
+			this.mode = options.mode || '';
 		},
 		async mounted() {
 			// await this.initFn(this.userid)
@@ -70,7 +85,7 @@
 				if (!this.name ||
 					!this.age ||
 					!this.sex ||
-					!this.phonenumber||
+					!this.phonenumber ||
 					!this.filePath
 				) {
 					uni.showToast({
@@ -87,44 +102,93 @@
 					uni.hideLoading()
 				}, 5000)
 				// 使用 uni.uploadFile 上传文件
-				uni.uploadFile({
-					url: `${BASE_URL}first/savepersson`, // 你的后端上传接口
-					filePath: this.filePath,
-					name: 'filePath', // 后端接收字段名
-					formData: {
-						userid: this.userid,
-						phonenumber: this.phonenumber,
-						name: this.name,
-						age: this.age,
-						sex: this.sex,
-						fileName: this.fileName
-					},
-					success: res => {
-						const data = JSON.parse(res.data);
-						if (data.success) {
+				let check = this.filePath.indexOf('blob') 
+				console.log(check,'checkcccccc',this.filePath)
+				if (this.mode) {
+					uni.uploadFile({
+						url: `${BASE_URL}first/updateperson`,
+						method: 'POST',
+						filePath: check >=0  ? this.filePath : '',  // 直接传路径，后端要判断是否是网络路径
+						name: 'filePath', // 后端接收字段名
+						formData: {
+							userid: this.userid,
+							phonenumber: this.phonenumber,
+							name: this.name,
+							age: this.age,
+							sex: this.sex,
+							fileName: this.fileName
+						},
+						success: res => {
+							uni.hideLoading();
+						
+							res = res.data ? JSON.parse(res.data) : {},
+							console.log('提交成功：', res);
+							if (res.success) {
+								uni.showToast({
+									title: '修改成功'
+								});
+								setTimeout(() => {
+									uni.navigateTo({
+										url: `/pages/index/deepseek/deepseek`
+									});
+								}, 2000);
+							} else {
+								uni.showToast({
+									title: '修改失败',
+									icon: 'none'
+								});
+							}
+						},
+						fail: err => {
+							uni.hideLoading();
+							console.error('修改失败：', err);
 							uni.showToast({
-								title: '提交成功'
+								title: '修改失败',
+								icon: 'none'
 							});
-							setTimeout(()=>{
-								uni.navigateTo({
-									url: `/pages/index/deepseek/deepseek`
-								})
-							},2000)
-						} else {
+						}
+					});
+				} else {
+					uni.uploadFile({
+						url: `${BASE_URL}first/savepersson`, // 你的后端上传接口
+						filePath: this.filePath,
+						name: 'filePath', // 后端接收字段名
+						formData: {
+							userid: this.userid,
+							phonenumber: this.phonenumber,
+							name: this.name,
+							age: this.age,
+							sex: this.sex,
+							fileName: this.fileName
+						},
+						success: res => {
+							const data = JSON.parse(res.data);
+							if (data.success) {
+								uni.showToast({
+									title: '提交成功'
+								});
+								setTimeout(() => {
+									uni.navigateTo({
+										url: `/pages/index/deepseek/deepseek`
+									})
+								}, 2000)
+							} else {
+								uni.showToast({
+									title: '提交失败',
+									icon: 'none'
+								});
+							}
+						},
+						fail: err => {
+							console.error(err);
 							uni.showToast({
 								title: '提交失败',
 								icon: 'none'
 							});
 						}
-					},
-					fail: err => {
-						console.error(err);
-						uni.showToast({
-							title: '提交失败',
-							icon: 'none'
-						});
-					}
-				});
+					});
+				}
+
 			}
 		}
 	};

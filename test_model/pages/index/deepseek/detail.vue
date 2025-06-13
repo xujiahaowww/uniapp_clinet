@@ -26,18 +26,17 @@
 
 
 		<!-- 文件上传 -->
-		<view class="form-item">
+		<view class="form-item" style="border-bottom: 1px solid #808080">
 			<text>详情描述:</text>
 			<input type="text" v-model="detail" placeholder="请输入描述" />
 			<text>上传材料:</text>
-			<view>	
-				<image :src="upload" @click="chooseFile"
-					style="height: 100rpx;width: 100rpx;margin-top: 10rpx;margin-left: 30rpx;"></image>
+			<view>
+				<image :src="upload" @click="chooseFile" style="height: 100rpx;width: 100rpx;margin-top: 10rpx;margin-left: 30rpx;"></image>
 				<!-- <button @click="chooseFile">选择文件</button> -->
 			</view>
 
 			<view v-if="fileName" class="file-name">{{ fileName }}</view>
-			<view v-if="fileName" @click="shanchu" style=" color:#808080;width: 10%;border-radius: 7px;">删除</view>
+			<view v-if="fileName" @click="shanchu" style=" color:#808080;width: 30%;border-radius: 7px;">删除</view>
 			<view v-if="filePath" class="image-preview">
 				<image :src="filePath" class="preview-img" />
 			</view>
@@ -222,51 +221,87 @@
 					return;
 				}
 				uni.showLoading({
-					title: '上传中...', // 可自定义加载框的提示文本
+					title: '上传中,这个过程需要点时间，请稍等...', // 可自定义加载框的提示文本
 					mask: true // 设置为 `true` 时，会显示一个遮罩层，防止用户进行其他操作
 				});
 				setTimeout(() => {
 					uni.hideLoading()
-				}, 60000)
+				}, 300000)
 				const now = new Date()
-				// 使用 uni.uploadFile 上传文件
-				uni.uploadFile({
-					url: `${ BASE_URL }first/imagesave`, // 后端上传接口
-					filePath: this.filePath,
-					name: 'filePath',
+				this.uploadWithTimeout({
+					url: `${ BASE_URL }first/imagesave`,
+					file: this.filePath,
+					timeout: 300000, // 300秒
 					formData: {
 						userid: this.userid,
 						date: this.formatDate(now),
 						detail: this.detail,
 						fileName: this.fileName
-					},
-					success: (res) => {
-						const data = JSON.parse(res.data);
-						if (data.success) {
-							uni.hideLoading()
-							uni.showToast({
-								title: '提交成功',
-								icon: 'success'
-							})
-							this.initFn(this.userid)
-							this.shanchu()
-							this.detail = ''
-						} else {
-							uni.hideLoading()
-							uni.showToast({
-								title: '提交失败',
-								icon: 'none'
-							});
-						}
-					},
-					fail() {
+					}
+				}).then(res => {
+					console.log(res)
+					const data = res
+					if (data.success) {
 						uni.hideLoading()
 						uni.showToast({
-							title: '上传失败',
+							title: '提交成功',
+							icon: 'success'
+						})
+						this.initFn(this.userid)
+						this.shanchu()
+						this.detail = ''
+					} else {
+						uni.hideLoading()
+						uni.showToast({
+							title: '提交失败',
 							icon: 'none'
 						});
 					}
-				});
+				}).catch(err => {
+					console.log(err)
+					uni.hideLoading()
+					uni.showToast({
+						title: '上传失败',
+						icon: 'none'
+					});
+				})
+			},
+			uploadWithTimeout({
+				url,
+				file,
+				formData = {},
+				timeout = 300000
+			}) {
+				return new Promise(async(resolve, reject) => {
+					const xhr = new XMLHttpRequest()
+					xhr.open('POST', url, true)
+					xhr.timeout = timeout // 这里直接设置超时
+					xhr.onload = () => {
+						if (xhr.status >= 200 && xhr.status < 300) {
+							resolve(JSON.parse(xhr.responseText))
+						} else {
+							reject({
+								errMsg: `HTTP ${xhr.status}`
+							})
+						}
+					}
+					xhr.ontimeout = () => {
+						reject({
+							errMsg: `upload timeout after ${timeout} ms`
+						})
+					}
+					xhr.onerror = () => reject({
+						errMsg: 'upload error'
+					})
+					console.log(file,'filefile')
+					const resp = await fetch(file)
+					const blob = await resp.blob()
+		
+					const data = new FormData()
+					data.append('filePath', blob)
+					Object.entries(formData).forEach(([k, v]) => data.append(k, v))
+					xhr.send(data)
+				})
 			}
 		}
 	};
